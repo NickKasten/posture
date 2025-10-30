@@ -1,4 +1,4 @@
-# 📋 Vibe-Post Developer Documentation Review
+# 📋 Posture Developer Documentation Review
 
 ## ✅ What You’ve Done Well
 

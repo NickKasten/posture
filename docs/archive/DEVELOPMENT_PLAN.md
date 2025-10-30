@@ -1,6 +1,6 @@
 # 🚀 Development Plan - LinkedPost Agent Web App
 
-**Project:** Vibe-Post LinkedPost Agent (Web Edition)  
+**Project:** Posture LinkedPost Agent (Web Edition)  
 **Timeline:** 7-Day MVP Sprint  
 **Architecture:** Next.js + TypeScript + Supabase  
 **Security:** Cloud-first with encrypted token storage

@@ -1,6 +1,6 @@
 # 📄 Product Requirements Document (PRD)
 
-**Product Name:** "Vibe-Post" LinkedPost Agent (Web Edition)  
+**Product Name:** "Posture" LinkedPost Agent (Web Edition)  
 **Owner:** Nicholas Kasten  
 **Date:** July 2025  
 **Version:** 1.2
@@ -97,4 +97,4 @@ The app provides inline editing and one-click publishing to LinkedIn using user-
 
 ## 🧾 Summary
 
-This version of *Vibe-Post* offers a rapid, cloud-first way for developers to turn commits into shareable content. It removes desktop setup friction while retaining security and editing control. The web app form accelerates MVP delivery and increases accessibility for users.
+This version of *Posture* offers a rapid, cloud-first way for developers to turn commits into shareable content. It removes desktop setup friction while retaining security and editing control. The web app form accelerates MVP delivery and increases accessibility for users.
