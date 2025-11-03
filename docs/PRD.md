@@ -30,7 +30,7 @@
 - ✅ Comprehensive test coverage
 
 **In Progress:**
-- ⏳ AI post generation (GPT-4)
+- ⏳ AI post generation (GPT-5-mini)
 - ⏳ LinkedIn/Twitter OAuth
 - ⏳ Social media publishing
 - ⏳ OpenAI Apps SDK (MCP) integration
@@ -64,7 +64,9 @@
 ### Phase 1: MVP (Current Focus)
 
 #### 1. AI Post Generation
-- GPT-4 powered content creation
+- GPT-5-mini (gpt-5-mini-2025-08-07) powered content creation
+- 400K token context window, 128K max output
+- Cost: $0.25/1M input tokens, $2/1M output tokens (98% cheaper than GPT-4o)
 - Input: User describes recent work or achievement
 - Output: Professional LinkedIn/Twitter post
 - Character limits enforced (LinkedIn: 1300, Twitter: 280)
@@ -209,7 +211,7 @@ Safety controls:
 ### Backend Stack
 - **API:** Next.js API Routes (serverless)
 - **Database:** Supabase PostgreSQL + Prisma ORM
-- **AI:** OpenAI GPT-4 API
+- **AI:** OpenAI GPT-5-mini API (gpt-5-mini-2025-08-07)
 - **Auth:** Supabase Auth + OAuth 2.1 (PKCE)
 - **Payments:** Stripe (Checkout + Webhooks)
 - **MCP Server:** Node.js + Fastify (or Next.js routes)
@@ -295,7 +297,7 @@ type SubscriptionState =
 - Mitigation: Queue posts, exponential backoff, user notifications
 
 **OpenAI API Costs**
-- Mitigation: Token usage tracking, caching, rate limiting, consider GPT-3.5 for non-critical features
+- Mitigation: Token usage tracking, 90% caching discount (GPT-5-mini), rate limiting
 
 **Database Performance**
 - Mitigation: Query optimization, indexing, connection pooling, monitor slow queries

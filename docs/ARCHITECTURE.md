@@ -26,7 +26,10 @@ Vibe Posts is built as a modern Next.js application with a focus on type-safety,
 - **Database:** Supabase PostgreSQL
 - **ORM:** Direct SQL (Prisma planned for Phase 2)
 - **Authentication:** Supabase Auth + OAuth 2.1
-- **AI:** OpenAI GPT-4 API
+- **AI:** OpenAI GPT-5-mini API (gpt-5-mini-2025-08-07)
+  - Cost: $0.25/1M input, $2/1M output tokens
+  - 400K context window, 128K max output
+  - 90% caching discount for repeated prompts
 - **Encryption:** Node.js crypto (AES-256-CBC)
 
 ### Infrastructure

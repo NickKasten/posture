@@ -1,61 +1,155 @@
-import { sanitizeUserInput as baseSanitizeUserInput } from '../../../utils/sanitize';
-import { validateUserInput, validatePostContent, MAX_POST_LENGTH } from '../../../utils/validation';
+// src/app/api/ai/route.ts
+// AI Post Generation API - GPT-5-mini Integration
 
-// Enhanced sanitization for AI output
-function sanitizeUserInput(input: string): string {
-  let sanitized = baseSanitizeUserInput(input);
-  // Remove SQL keywords and common prompt injection patterns
-  sanitized = sanitized.replace(/DROP TABLE/gi, '').replace(/System:/gi, '').replace(/Assistant:/gi, '');
-  return sanitized;
-}
+import { NextRequest, NextResponse } from 'next/server';
+import { generatePost } from '@/lib/ai/client';
+import { sanitizeUserInput } from '@/utils/sanitize';
+import { validateUserInput } from '@/utils/validation';
+import { z } from 'zod';
 
-// AI API route: POST /api/ai
-// Expects: { activity: string, context: string, style: string }
-// Returns: { post: string, hashtags: string[] }
+// Request validation schema
+const GeneratePostRequestSchema = z.object({
+  topic: z.string().min(10, 'Topic must be at least 10 characters').max(500, 'Topic too long'),
+  platform: z.enum(['linkedin', 'twitter', 'both'], {
+    errorMap: () => ({ message: 'Platform must be linkedin, twitter, or both' }),
+  }),
+  tone: z.enum(['technical', 'casual', 'inspiring']).optional(),
+  githubActivity: z.string().max(2000, 'GitHub activity too long').optional(),
+  maxLength: z.number().min(50).max(2000).optional(),
+});
 
-export async function POST(request: Request) {
+export type GeneratePostRequest = z.infer<typeof GeneratePostRequestSchema>;
+
+/**
+ * POST /api/ai
+ *
+ * Generate a LinkedIn or Twitter post using GPT-5-mini
+ *
+ * Request body:
+ * {
+ *   "topic": "I reduced API latency by 40%",
+ *   "platform": "linkedin" | "twitter" | "both",
+ *   "tone": "technical" | "casual" | "inspiring" (optional),
+ *   "githubActivity": "Recent commits..." (optional),
+ *   "maxLength": 1300 (optional)
+ * }
+ *
+ * Response:
+ * {
+ *   "content": "Just reduced API latency...",
+ *   "hashtags": ["WebDev", "Performance"],
+ *   "characterCount": 58,
+ *   "platform": "linkedin"
+ * }
+ */
+export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as any;
-    const { activity, context, style } = body;
-    // Sanitize and validate input
-    const sanitizedActivity = sanitizeUserInput(activity || '');
-    const sanitizedContext = sanitizeUserInput(context || '');
-    const styleValue = typeof style === 'string' ? style : 'Technical';
+    // Parse and validate request body
+    const body = await request.json();
+    const validationResult = GeneratePostRequestSchema.safeParse(body);
 
-    const activityValidation = validateUserInput(sanitizedActivity);
-    const contextValidation = validateUserInput(sanitizedContext);
-    if (!activityValidation.isValid) {
-      return new Response(JSON.stringify({ error: 'Invalid activity', details: activityValidation.error }), { status: 400 });
-    }
-    if (!contextValidation.isValid) {
-      return new Response(JSON.stringify({ error: 'Invalid context', details: contextValidation.error }), { status: 400 });
-    }
-
-    // Generate prompt
-    const prompt = `SYSTEM: You are a LinkedIn post generator. Generate professional posts only.\nGITHUB_ACTIVITY: ${sanitizedActivity}\nUSER_CONTEXT: ${sanitizedContext}\nSTYLE: ${styleValue}\n\nRespond with valid JSON: {"post": "...", "hashtags": ["..."]}`;
-
-    // --- AI API call (mocked for now) ---
-    // In production, call OpenAI, Anthropic, or Gemini API here
-    // For now, return a mock response using sanitized input only
-    let post = `Here's a LinkedIn post about: ${sanitizedActivity} (${sanitizedContext}) [${styleValue}]`;
-    // Final output sanitization
-    post = sanitizeUserInput(post);
-    const aiResponse = {
-      post,
-      hashtags: ['#AI', '#LinkedIn', '#Dev']
-    };
-
-    // Validate AI response
-    const postValidation = validatePostContent(aiResponse.post);
-    if (!postValidation.isValid) {
-      return new Response(JSON.stringify({ error: 'Generated post invalid', details: postValidation.error }), { status: 500 });
-    }
-    if (!Array.isArray(aiResponse.hashtags) || !aiResponse.hashtags.every(h => typeof h === 'string')) {
-      return new Response(JSON.stringify({ error: 'Invalid hashtags format' }), { status: 500 });
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid request',
+          details: validationResult.error.issues.map((issue) => ({
+            field: issue.path.join('.'),
+            message: issue.message,
+          })),
+        },
+        { status: 400 }
+      );
     }
 
-    return new Response(JSON.stringify(aiResponse), { status: 200 });
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: 'Internal server error', details: err.message }), { status: 500 });
+    const { topic, platform, tone, githubActivity, maxLength } = validationResult.data;
+
+    // Sanitize inputs
+    const sanitizedTopic = sanitizeUserInput(topic);
+    const sanitizedActivity = githubActivity ? sanitizeUserInput(githubActivity) : undefined;
+
+    // Additional validation for sanitized inputs
+    const topicValidation = validateUserInput(sanitizedTopic);
+    if (!topicValidation.isValid) {
+      return NextResponse.json(
+        { error: 'Invalid topic', details: topicValidation.error },
+        { status: 400 }
+      );
+    }
+
+    if (sanitizedActivity) {
+      const activityValidation = validateUserInput(sanitizedActivity);
+      if (!activityValidation.isValid) {
+        return NextResponse.json(
+          { error: 'Invalid GitHub activity', details: activityValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Generate post using GPT-5-mini
+    try {
+      const result = await generatePost({
+        topic: sanitizedTopic,
+        platform,
+        tone,
+        githubActivity: sanitizedActivity,
+        maxLength,
+      });
+
+      return NextResponse.json(result, { status: 200 });
+
+    } catch (aiError: any) {
+      console.error('AI generation error:', aiError);
+
+      // Check for specific OpenAI errors
+      if (aiError.status === 429) {
+        return NextResponse.json(
+          {
+            error: 'Rate limit exceeded',
+            message: 'Too many requests. Please try again in a few moments.',
+          },
+          { status: 429 }
+        );
+      }
+
+      if (aiError.status === 401) {
+        return NextResponse.json(
+          { error: 'Authentication failed', message: 'Invalid API key configuration.' },
+          { status: 500 }
+        );
+      }
+
+      if (aiError.status === 400) {
+        return NextResponse.json(
+          {
+            error: 'Invalid request to AI service',
+            message: 'The request could not be processed by the AI service.',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Generic AI error
+      return NextResponse.json(
+        {
+          error: 'AI generation failed',
+          message: 'Unable to generate post. Please try again.',
+          details: process.env.NODE_ENV === 'development' ? aiError.message : undefined,
+        },
+        { status: 500 }
+      );
+    }
+
+  } catch (error: any) {
+    console.error('Unexpected error in /api/ai:', error);
+
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        message: 'An unexpected error occurred.',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      },
+      { status: 500 }
+    );
   }
-} 
+}

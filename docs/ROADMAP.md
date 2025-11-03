@@ -38,7 +38,7 @@ This roadmap outlines the planned features and timeline for Vibe Posts developme
 #### Features
 
 **1. AI Post Generation** (Week 1)
-- OpenAI GPT-4 integration
+- OpenAI GPT-5-mini integration (gpt-5-mini-2025-08-07)
 - Structured prompt engineering
 - Tone selection (Technical, Casual, Inspiring)
 - Character limit enforcement
@@ -125,7 +125,7 @@ This roadmap outlines the planned features and timeline for Vibe Posts developme
 - Brand profile creation
 - Tone and style learning
 - Career goals tracking
-- GPT-4 embeddings for tone consistency
+- GPT-5-mini embeddings for tone consistency
 
 **Deliverables:**
 - Brand onboarding flow
@@ -240,7 +240,7 @@ This roadmap outlines the planned features and timeline for Vibe Posts developme
 **2. Advanced Analytics** (Week 2-3)
 - Post performance tracking
 - Engagement rate analysis
-- Sentiment analysis (GPT-4)
+- Sentiment analysis (GPT-5-mini)
 - Best posting time recommendations
 - Trend detection
 
@@ -422,7 +422,7 @@ This roadmap outlines the planned features and timeline for Vibe Posts developme
 ## Risk Mitigation
 
 ### Technical Risks
-- **OpenAI API costs:** Token usage tracking, caching, consider GPT-3.5 for non-critical features
+- **OpenAI API costs:** Token usage tracking, 90% caching discount (GPT-5-mini), ~$1/month for 100 posts/day
 - **API rate limits:** Queueing system, exponential backoff, user notifications
 - **Database performance:** Connection pooling, read replicas, query optimization
 
