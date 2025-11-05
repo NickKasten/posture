@@ -1,0 +1,68 @@
+
+> vibe-posts@0.1.0 test
+> jest PostGenerator.test.tsx --coverage --coveragePathIgnorePatterns=node_modules
+
+PASS src/components/__tests__/PostGenerator.test.tsx (5.442 s)
+  PostGenerator
+    Rendering
+      ✓ should render all form elements (82 ms)
+      ✓ should have LinkedIn selected by default (14 ms)
+      ✓ should have technical tone selected by default (8 ms)
+    Character Counter
+      ✓ should update character count on input (61 ms)
+      ✓ should not allow input beyond 500 characters (1445 ms)
+      ✓ should highlight character count when approaching limit (1162 ms)
+    Form Validation
+      ✓ should disable submit button when topic is empty (8 ms)
+      ✓ should disable submit button when topic is less than 10 characters (28 ms)
+      ✓ should enable submit button when topic is 10 or more characters (122 ms)
+      ✓ should show validation error when submitting invalid form (38 ms)
+    Platform Selection
+      ✓ should allow switching between platforms (24 ms)
+      ✓ should select "both" platform (18 ms)
+    Tone Selection
+      ✓ should allow changing tone (133 ms)
+    GitHub Activity Checkbox
+      ✓ should toggle GitHub activity checkbox (24 ms)
+    API Integration
+      ✓ should call API with correct parameters on submit (136 ms)
+      ✓ should include GitHub activity in request when checkbox is checked (146 ms)
+    Loading State
+      ✓ should display loading state while generating (212 ms)
+      ✓ should disable all form inputs while generating (184 ms)
+    Error Handling
+      ✓ should display error message on API failure (109 ms)
+      ✓ should display rate limit error (85 ms)
+      ✓ should display validation errors from API (130 ms)
+      ✓ should clear error when user types after error (121 ms)
+    Success Callback
+      ✓ should call onPostGenerated callback with generated post (113 ms)
+      ✓ should reset form after successful generation (125 ms)
+    Accessibility
+      ✓ should have proper ARIA labels on all inputs (9 ms)
+      ✓ should set aria-invalid when topic is invalid (27 ms)
+      ✓ should have aria-live region for character counter (5 ms)
+      ✓ should have role="alert" on error messages (125 ms)
+      ✓ should support keyboard navigation (20 ms)
+      ✓ should have accessible button states (197 ms)
+
+--------------------|---------|----------|---------|---------|-------------------
+File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+--------------------|---------|----------|---------|---------|-------------------
+All files           |   85.57 |    86.95 |   76.66 |   86.27 |                   
+ components         |   88.52 |    86.48 |   77.77 |   88.33 |                   
+  PostGenerator.tsx |   88.52 |    86.48 |   77.77 |   88.33 | 61-64,97,185,241  
+ components/ui      |   79.48 |    88.88 |      75 |   81.57 |                   
+  button.tsx        |    87.5 |    66.66 |     100 |     100 | 48                
+  card.tsx          |   77.77 |      100 |   71.42 |   77.77 | 87,89             
+  label.tsx         |     100 |      100 |     100 |     100 |                   
+  select.tsx        |   64.28 |      100 |      70 |   64.28 | 177,179-182       
+  textarea.tsx      |     100 |      100 |     100 |     100 |                   
+ lib                |     100 |      100 |     100 |     100 |                   
+  utils.ts          |     100 |      100 |     100 |     100 |                   
+--------------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 passed, 1 total
+Tests:       30 passed, 30 total
+Snapshots:   0 total
+Time:        5.787 s, estimated 6 s
+Ran all test suites matching PostGenerator.test.tsx.

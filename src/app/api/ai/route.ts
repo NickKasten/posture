@@ -3,8 +3,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePost } from '@/lib/ai/client';
-import { sanitizeUserInput } from '@/utils/sanitize';
-import { validateUserInput } from '@/utils/validation';
+import { sanitizeTopic, sanitizeUserInput } from '@/utils/sanitize-v2';
+import { validateTopic, GitHubActivitySchema } from '@/utils/validation-v2';
+import { aiRateLimit } from '@/lib/rate-limit/client';
+import { withRateLimit, addRateLimitHeaders } from '@/lib/rate-limit/middleware';
+import { handleAPIError } from '@/lib/errors/handler';
+import { ValidationError, ExternalAPIError } from '@/lib/errors/framework';
 import { z } from 'zod';
 
 // Request validation schema
@@ -16,6 +20,7 @@ const GeneratePostRequestSchema = z.object({
   tone: z.enum(['technical', 'casual', 'inspiring']).optional(),
   githubActivity: z.string().max(2000, 'GitHub activity too long').optional(),
   maxLength: z.number().min(50).max(2000).optional(),
+  userId: z.string().optional(), // For rate limiting
 });
 
 export type GeneratePostRequest = z.infer<typeof GeneratePostRequestSchema>;
@@ -25,13 +30,16 @@ export type GeneratePostRequest = z.infer<typeof GeneratePostRequestSchema>;
  *
  * Generate a LinkedIn or Twitter post using GPT-5-mini
  *
+ * Rate limit: 10 requests per hour (user-based, falls back to IP-based)
+ *
  * Request body:
  * {
  *   "topic": "I reduced API latency by 40%",
  *   "platform": "linkedin" | "twitter" | "both",
  *   "tone": "technical" | "casual" | "inspiring" (optional),
  *   "githubActivity": "Recent commits..." (optional),
- *   "maxLength": 1300 (optional)
+ *   "maxLength": 1300 (optional),
+ *   "userId": "user123" (optional, for rate limiting)
  * }
  *
  * Response:
@@ -49,40 +57,42 @@ export async function POST(request: NextRequest) {
     const validationResult = GeneratePostRequestSchema.safeParse(body);
 
     if (!validationResult.success) {
-      return NextResponse.json(
-        {
-          error: 'Invalid request',
-          details: validationResult.error.issues.map((issue) => ({
-            field: issue.path.join('.'),
-            message: issue.message,
-          })),
-        },
-        { status: 400 }
-      );
+      throw new ValidationError('Invalid request', {
+        fields: validationResult.error.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
+        })),
+      });
     }
 
-    const { topic, platform, tone, githubActivity, maxLength } = validationResult.data;
+    const { userId, topic, platform, tone, githubActivity, maxLength } = validationResult.data;
 
-    // Sanitize inputs
-    const sanitizedTopic = sanitizeUserInput(topic);
-    const sanitizedActivity = githubActivity ? sanitizeUserInput(githubActivity) : undefined;
+    // Apply rate limiting (user-based if userId provided, otherwise IP-based)
+    const rateLimitResult = await withRateLimit(request, aiRateLimit, userId);
+    if (!rateLimitResult.allowed) {
+      return rateLimitResult.response!;
+    }
+
+    // Sanitize inputs using v2 sanitization (prevents XSS and prompt injection)
+    const sanitizedTopic = sanitizeTopic(topic);
+    const sanitizedActivity = githubActivity
+      ? sanitizeUserInput(githubActivity, { maxLength: 2000, preventAIInjection: true })
+      : undefined;
 
     // Additional validation for sanitized inputs
-    const topicValidation = validateUserInput(sanitizedTopic);
+    const topicValidation = validateTopic(sanitizedTopic);
     if (!topicValidation.isValid) {
-      return NextResponse.json(
-        { error: 'Invalid topic', details: topicValidation.error },
-        { status: 400 }
-      );
+      throw new ValidationError('Invalid topic', {
+        error: topicValidation.error,
+      });
     }
 
     if (sanitizedActivity) {
-      const activityValidation = validateUserInput(sanitizedActivity);
-      if (!activityValidation.isValid) {
-        return NextResponse.json(
-          { error: 'Invalid GitHub activity', details: activityValidation.error },
-          { status: 400 }
-        );
+      const activityValidation = GitHubActivitySchema.safeParse(sanitizedActivity);
+      if (!activityValidation.success) {
+        throw new ValidationError('Invalid GitHub activity', {
+          error: activityValidation.error.issues[0]?.message,
+        });
       }
     }
 
@@ -96,60 +106,52 @@ export async function POST(request: NextRequest) {
         maxLength,
       });
 
-      return NextResponse.json(result, { status: 200 });
+      const response = NextResponse.json(result, { status: 200 });
+
+      // Add rate limit headers to response
+      if (rateLimitResult.metadata) {
+        return addRateLimitHeaders(response, rateLimitResult.metadata);
+      }
+
+      return response;
 
     } catch (aiError: any) {
-      console.error('AI generation error:', aiError);
-
       // Check for specific OpenAI errors
       if (aiError.status === 429) {
-        return NextResponse.json(
-          {
-            error: 'Rate limit exceeded',
-            message: 'Too many requests. Please try again in a few moments.',
-          },
-          { status: 429 }
+        throw new ExternalAPIError(
+          'OpenAI',
+          'AI rate limit exceeded. Please try again in a few moments.',
+          { status: aiError.status }
         );
       }
 
       if (aiError.status === 401) {
-        return NextResponse.json(
-          { error: 'Authentication failed', message: 'Invalid API key configuration.' },
-          { status: 500 }
+        throw new ExternalAPIError(
+          'OpenAI',
+          'AI authentication failed',
+          { status: aiError.status }
         );
       }
 
       if (aiError.status === 400) {
-        return NextResponse.json(
-          {
-            error: 'Invalid request to AI service',
-            message: 'The request could not be processed by the AI service.',
-          },
-          { status: 400 }
+        throw new ExternalAPIError(
+          'OpenAI',
+          'Invalid request to AI service',
+          { status: aiError.status }
         );
       }
 
       // Generic AI error
-      return NextResponse.json(
-        {
-          error: 'AI generation failed',
-          message: 'Unable to generate post. Please try again.',
-          details: process.env.NODE_ENV === 'development' ? aiError.message : undefined,
-        },
-        { status: 500 }
+      throw new ExternalAPIError(
+        'OpenAI',
+        'AI generation failed. Please try again.',
+        { message: aiError.message }
       );
     }
 
   } catch (error: any) {
-    console.error('Unexpected error in /api/ai:', error);
-
-    return NextResponse.json(
-      {
-        error: 'Internal server error',
-        message: 'An unexpected error occurred.',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
-      },
-      { status: 500 }
-    );
+    return handleAPIError(error, {
+      endpoint: '/api/ai',
+    });
   }
 }

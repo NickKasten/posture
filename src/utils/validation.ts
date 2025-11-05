@@ -1,3 +1,24 @@
+/**
+ * DEPRECATED: Use validation-v2.ts instead
+ *
+ * This module contains legacy validation functions without comprehensive
+ * type safety and limited error messaging.
+ *
+ * Migration Guide:
+ * - Replace: validatePostContent() -> validatePostContent() from validation-v2.ts
+ * - Replace: validateUserInput() -> validateUserInput() from validation-v2.ts
+ * - Use Zod schemas directly from validation-v2.ts for Typescript types
+ *
+ * The v2 version provides:
+ * ✓ Zod-based schemas for type safety
+ * ✓ Better error messages
+ * ✓ Validation result types with data
+ * ✓ Batch validation utilities
+ * ✓ Custom refinements for business logic
+ *
+ * New implementations MUST use validation-v2.ts
+ */
+
 export const MAX_USER_INPUT_LENGTH = 500
 export const MAX_POST_LENGTH = 1300
 

@@ -1,11 +1,20 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseClient, encrypt } from '../../../../lib/storage/supabase';
+import { authRateLimit } from '@/lib/rate-limit/client';
+import { withRateLimit } from '@/lib/rate-limit/middleware';
 
 // GitHub OAuth API route
 
 const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  // Apply rate limiting (IP-based to prevent OAuth abuse)
+  const rateLimitResult = await withRateLimit(request, authRateLimit);
+  if (!rateLimitResult.allowed) {
+    return rateLimitResult.response!;
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
