@@ -3,13 +3,14 @@
 import * as React from 'react'
 import { PostGenerator } from '@/components/PostGenerator'
 import { PostPreview } from '@/components/PostPreview'
+import { ConnectAccountsCard } from '@/components/ConnectAccountsCard'
 import type { GeneratedPost, Platform } from '@/types/post'
 
 /**
  * Dashboard Page
  *
  * Main interface for generating and publishing LinkedIn/Twitter posts
- * Integrates PostGenerator and PostPreview components
+ * Integrates PostGenerator, PostPreview, and ConnectAccountsCard components
  */
 export default function DashboardPage() {
   const [generatedPost, setGeneratedPost] = React.useState<GeneratedPost | null>(null)
@@ -129,6 +130,9 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="space-y-6">
+        {/* Connect Accounts Card */}
+        <ConnectAccountsCard />
+
         {/* Show PostGenerator if no generated post */}
         {!generatedPost && (
           <PostGenerator onPostGenerated={handlePostGenerated} />
