@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       // Handle specific errors
-      if (result.error?.code === 'TOKEN_EXPIRED') {
+      if (result.error_details?.code === 'TOKEN_EXPIRED') {
         return NextResponse.json(
           {
             error: 'Token expired',
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (result.error?.code === 'RATE_LIMIT_EXCEEDED') {
+      if (result.error_details?.code === 'RATE_LIMIT_EXCEEDED') {
         return NextResponse.json(
           {
             error: 'Rate limit exceeded',
@@ -146,8 +146,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Publishing failed',
-          message: result.error?.message || 'Failed to publish post to LinkedIn',
-          code: result.error?.code,
+          message: result.error || result.error_details?.message || 'Failed to publish post to LinkedIn',
+          code: result.error_details?.code,
         },
         { status: 500 }
       );

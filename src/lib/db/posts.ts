@@ -379,8 +379,16 @@ export async function getPublishedPosts(
       query = query.lte('published_at', filters.published_before);
     }
 
-    // Apply ordering last
+    // Apply ordering
     query = query.order('published_at', { ascending: false });
+
+    // Apply pagination
+    if (filters?.limit !== undefined) {
+      query = query.limit(filters.limit);
+    }
+    if (filters?.offset !== undefined) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1);
+    }
 
     const { data, error } = await query;
 

@@ -247,6 +247,8 @@ export interface PublishedPostFilters {
   platform?: Platform;
   published_after?: string;
   published_before?: string;
+  limit?: number;
+  offset?: number;
 }
 
 /**

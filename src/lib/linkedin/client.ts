@@ -93,7 +93,8 @@ export class LinkedInClient {
 
       return {
         success: false,
-        error: linkedInError,
+        error: linkedInError.message,
+        error_details: linkedInError,
       };
     }
   }

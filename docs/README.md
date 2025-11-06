@@ -1,24 +1,80 @@
 # Vibe Posts Documentation
 
-**Welcome to the Vibe Posts documentation!**
-
-This is your central hub for understanding, building, and deploying the AI-powered social media manager.
+Welcome to the Vibe Posts documentation! This directory contains all technical documentation, guides, and references for the project.
 
 ---
 
-## Quick Start
+## 📚 Documentation Structure
 
-**New to the project?** Start here (30 minutes):
+### 🚀 [01-getting-started/](./01-getting-started/)
 
-1. **[PRD.md](./PRD.md)** (15 min) - Product vision, features, subscription tiers
-2. **[ARCHITECTURE.md](./ARCHITECTURE.md)** (10 min) - Technical stack and design decisions
-3. **[DEVELOPMENT.md](./DEVELOPMENT.md)** (5 min) - Setup and development workflow
+**Start here** if you're new to Vibe Posts.
 
-**Ready to code?**
+- **[QUICK_START.md](./01-getting-started/QUICK_START.md)** - Get running in 15 minutes
+- **[SETUP_GUIDE.md](./01-getting-started/SETUP_GUIDE.md)** - Comprehensive setup instructions
 
-4. Follow [DEVELOPMENT.md](./DEVELOPMENT.md) setup instructions
-5. Check [ROADMAP.md](./ROADMAP.md) for current phase
-6. Reference [API_CONTRACTS.md](./API_CONTRACTS.md) for type-safe interfaces
+### 📦 [02-product/](./02-product/)
+
+Product vision, roadmap, and user experience.
+
+- **[PRD.md](./02-product/PRD.md)** - Product Requirements Document
+- **[ROADMAP.md](./02-product/ROADMAP.md)** - Development timeline and milestones
+- **[UI_FLOW.md](./02-product/UI_FLOW.md)** - User interface flows
+
+### 🏗️ [03-technical/](./03-technical/)
+
+System architecture and technical specifications.
+
+- **[ARCHITECTURE.md](./03-technical/ARCHITECTURE.md)** - System design and architecture
+- **[DATABASE_SCHEMA.md](./03-technical/DATABASE_SCHEMA.md)** - Database tables and migrations
+- **[API_CONTRACTS.md](./03-technical/API_CONTRACTS.md)** - API endpoints and TypeScript contracts
+- **[PROJECT_STRUCTURE.md](./03-technical/PROJECT_STRUCTURE.md)** - Code organization
+
+### 💻 [04-development/](./04-development/)
+
+Developer guides and workflows.
+
+- **[DEVELOPMENT.md](./04-development/DEVELOPMENT.md)** - Development workflow and testing
+
+### 🔒 [05-security/](./05-security/)
+
+Security policies and implementation.
+
+- **[SECURITY.md](./05-security/SECURITY.md)** - Security guidelines
+- **[SANITIZATION_VALIDATION_GUIDE.md](./05-security/SANITIZATION_VALIDATION_GUIDE.md)** - Input validation
+
+### 🔌 [06-integrations/](./06-integrations/)
+
+Third-party API integrations.
+
+- **[LINKEDIN.md](./06-integrations/LINKEDIN.md)** - LinkedIn API integration
+
+### ✨ [07-features/](./07-features/)
+
+Feature-specific documentation.
+
+*Documentation for features will be added here.*
+
+### 📦 [archive/](./archive/)
+
+Historical documentation and deprecated files.
+
+---
+
+## 🎯 Quick Links
+
+### For New Developers
+
+1. **[QUICK_START.md](./01-getting-started/QUICK_START.md)** - Get the app running
+2. **[PRD.md](./02-product/PRD.md)** - Product vision
+3. **[ARCHITECTURE.md](./03-technical/ARCHITECTURE.md)** - System design
+4. **[DATABASE_SCHEMA.md](./03-technical/DATABASE_SCHEMA.md)** - Data models
+
+### For Contributors
+
+- Development: [DEVELOPMENT.md](./04-development/DEVELOPMENT.md)
+- API Reference: [API_CONTRACTS.md](./03-technical/API_CONTRACTS.md)
+- Security: [SECURITY.md](./05-security/SECURITY.md)
 
 ---
 

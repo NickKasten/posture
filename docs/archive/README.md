@@ -1,12 +1,12 @@
 # 📦 Archived Documentation
 
-This folder contains superseded documentation files kept for historical reference.
+This directory contains historical documentation that is no longer actively maintained but preserved for reference.
 
 **These files are NO LONGER ACTIVE** - refer to the main `docs/` folder for current documentation.
 
 ---
 
-## Archived Files
+## What's Archived Here?
 
 ### DEVELOPMENT_PLAN.md (archived Oct 6, 2025)
 - **Original:** Development plan with checkboxes and status tracking

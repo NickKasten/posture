@@ -46,7 +46,7 @@ export const authRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(
     RATE_LIMITS.AUTH.requests,
-    RATE_LIMITS.AUTH.window
+    RATE_LIMITS.AUTH.window as any // Type mismatch - Upstash expects Duration but we provide string
   ),
   analytics: true,
   prefix: RATE_LIMITS.AUTH.prefix,
@@ -77,7 +77,7 @@ export const aiRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(
     RATE_LIMITS.AI.requests,
-    RATE_LIMITS.AI.window
+    RATE_LIMITS.AI.window as any
   ),
   analytics: true,
   prefix: RATE_LIMITS.AI.prefix,
@@ -108,7 +108,7 @@ export const publishRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(
     RATE_LIMITS.PUBLISH.requests,
-    RATE_LIMITS.PUBLISH.window
+    RATE_LIMITS.PUBLISH.window as any
   ),
   analytics: true,
   prefix: RATE_LIMITS.PUBLISH.prefix,
@@ -139,7 +139,7 @@ export const generalRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(
     RATE_LIMITS.API_GENERAL.requests,
-    RATE_LIMITS.API_GENERAL.window
+    RATE_LIMITS.API_GENERAL.window as any
   ),
   analytics: true,
   prefix: RATE_LIMITS.API_GENERAL.prefix,
@@ -170,7 +170,7 @@ export const githubRateLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(
     RATE_LIMITS.GITHUB_ACTIVITY.requests,
-    RATE_LIMITS.GITHUB_ACTIVITY.window
+    RATE_LIMITS.GITHUB_ACTIVITY.window as any
   ),
   analytics: true,
   prefix: RATE_LIMITS.GITHUB_ACTIVITY.prefix,

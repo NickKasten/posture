@@ -161,7 +161,7 @@ export function isTwitterAPIError(
     response !== null &&
     'status' in response &&
     'title' in response &&
-    typeof (response as TwitterAPIError).status === 'number'
+    typeof (response as unknown as TwitterAPIError).status === 'number'
   );
 }
 
